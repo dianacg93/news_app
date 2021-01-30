@@ -1,23 +1,60 @@
-import logo from './logo.svg';
 import './App.css';
+import { NavLink, Route, Switch } from 'react-router-dom';
+// import {BITCOIN} from './data/bitcoinSeed'
+// import {BUSINESS} from './data/businessSeed'
+import Bitcoin from './screens/Bitcoin'
+import Home from './screens/Home'
+import Business from './screens/Business';
+
+import {useState, useEffect} from 'react'
+import axios from "axios"; 
 
 function App() {
+
+  const [business, setBusiness] = useState([])
+  const [bitcoin, setBitcoin] = useState([])
+  
+  useEffect(() => {
+    const getBusinessNews = async () => {
+      const url = process.env.REACT_APP_API_URL+process.env.REACT_APP_API_KEY
+      const res = await axios.get(url)
+        setBusiness(res.data.articles)
+    }
+
+    getBusinessNews()
+  }, [])
+
+  useEffect(() => {
+    const getBitcoinNews = async () => {
+      const url = process.env.REACT_APP_BITCOIN_URL+process.env.REACT_APP_API_KEY
+      const res = await axios.get(url)
+      setBitcoin(res.data.articles)
+    }
+    getBitcoinNews()
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <nav>
+          <NavLink exact to="/">Home</NavLink>
+          <NavLink to={"/business"}>Business</NavLink>
+          <NavLink to={"/bitcoin"}>Bitcoin</NavLink> 
+        </nav>
+      </div>
+      <main>
+        <Switch>
+          <Route exact path="/"><Home/></Route>
+          <Route path="/business">
+            <Business
+            business={business}
+            /></Route>
+          <Route path="/bitcoin">
+            <Bitcoin
+            bitcoin={bitcoin}
+            /></Route>
+        </Switch>
+      </main>
     </div>
   );
 }
